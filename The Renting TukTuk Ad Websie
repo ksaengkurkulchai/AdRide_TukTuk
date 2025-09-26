@@ -1,0 +1,1078 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TukTuk AdRide — 80s Retro</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Source+Code+Pro:wght@400;600;900&display=swap" rel="stylesheet">
+
+<!-- model-viewer for 3D -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<!-- html2canvas for mockup download -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+
+<style>
+/* ====== 80s Retro Theme Tokens ====== */
+:root{
+  --bg-deep: #0a0520;
+  --bg-sky-1: #1a0a4a;
+  --bg-sky-2: #34146b;
+  --grid: rgba(0,255,247,.25);
+  --text: #e7e7ff;
+  --muted:#a9a9d6;
+
+  --neon-pink:#ff2bd6;   /* A border + heading color */
+  --neon-purple:#7a5cff; /* B border */
+  --neon-blue:#2dd4ff;   /* C border */
+  --neon-green:#22f7a8;  /* accents */
+
+  --accent: linear-gradient(90deg,#ff2bd6 0%,#7a5cff 40%,#00fff7 80%,#ff9800 100%);
+  --scanlines: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,.04) 0px,
+      rgba(255,255,255,.04) 1px,
+      transparent 2px,
+      transparent 4px
+  );
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  color:var(--text);
+  font-family:"Source Code Pro", monospace;
+  /* synthwave sky + horizon */
+  background:
+    radial-gradient(1200px 700px at 50% -10%, #c43bff1a 0%, transparent 60%),
+    radial-gradient(1000px 500px at 90% 10%, #00fff71a 0%, transparent 60%),
+    linear-gradient(180deg,var(--bg-sky-2) 0%, var(--bg-sky-1) 55%, var(--bg-deep) 70%);
+  overflow-x:hidden;
+}
+
+/* Extra pixel stars */
+body::before{
+  content:"";
+  position:fixed; inset:0; pointer-events:none; z-index:-2;
+  background:
+    radial-gradient(2px 2px at 10% 20%, #fff 70%, transparent 71%),
+    radial-gradient(2px 2px at 20% 80%, #fff 70%, transparent 71%),
+    radial-gradient(2px 2px at 60% 30%, #fff 70%, transparent 71%),
+    radial-gradient(2px 2px at 80% 50%, #fff 70%, transparent 71%),
+    radial-gradient(1.5px 1.5px at 40% 70%, #fff 70%, transparent 71%),
+    radial-gradient(1.5px 1.5px at 70% 15%, #fff 70%, transparent 71%),
+    radial-gradient(1.5px 1.5px at 85% 35%, #fff 70%, transparent 71%),
+    radial-gradient(1.5px 1.5px at 30% 15%, #fff 70%, transparent 71%);
+  opacity:.8;
+}
+
+/* Horizon Neon Grid */
+.horizon{
+  position:fixed; left:0; right:0; bottom:0; height:42vh; z-index:-1;
+  background:
+    linear-gradient(0deg, var(--bg-deep) 0%, transparent 65%),
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 50px),
+    linear-gradient(to bottom, transparent 0 15%, var(--grid) 15% 16%, transparent 16%) ;
+}
+.horizon::before{
+  content:"";
+  position:absolute; inset:0;
+  background: linear-gradient(transparent, transparent 60%, rgba(0,255,247,.15) 60.5% 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, black 25%, black 100%);
+}
+
+/* Pixel Moon + Clouds */
+.pixel-moon {
+  position: fixed;
+  top: 54px;
+  right: 120px;
+  width: 92px;
+  height: 92px;
+  background: radial-gradient(circle at 30% 30%, #fff9b1 0%, #f2e27c 40%, #d6b86a 70%, transparent 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgba(255,255,200,0.65), 0 0 40px rgba(255,255,150,0.35);
+  z-index: -1;
+  image-rendering: pixelated;
+}
+.pixel-cloud {
+  position: fixed;
+  background: #ffffff;
+  opacity: .9;
+  border-radius: 6px;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.6));
+  image-rendering: pixelated;
+  z-index: -1;
+  animation: drift 28s linear infinite;
+}
+.cloud1 { width: 140px; height: 42px; top: 110px; left: 80px; animation-duration: 34s;}
+.cloud2 { width: 170px; height: 50px; top: 165px; right: 220px; animation-direction: reverse;}
+.cloud3 { width: 110px; height: 34px; top: 210px; left: 280px; animation-duration: 26s;}
+@keyframes drift {
+  0% { transform: translateX(0) }
+  50%{ transform: translateX(30px) }
+  100%{ transform: translateX(0) }
+}
+
+/* Global scanline effect */
+.scan{ position:relative; }
+.scan::after{
+  content:"";
+  position:absolute; inset:0; pointer-events:none; opacity:.35;
+  background:var(--scanlines);
+  z-index:0;
+}
+
+/* ====== Retro Headings ====== */
+h1, h2, h3, h4, .retro-title, .panel h3 {
+  font-family: "Press Start 2P", system-ui, sans-serif;
+  color: var(--neon-pink);
+  text-shadow: 0 0 8px rgba(255,43,214,.6), 0 0 18px rgba(122,92,255,.5);
+  letter-spacing: 2px;
+  margin: 0 0 12px;
+}
+.retro-title{font-size: clamp(30px, 5vw, 64px); text-align:center}
+.retro-sub{color:var(--muted); max-width:860px; margin:6px auto 26px; text-align:center}
+
+/* PRESS START under the title */
+.press-start{
+  font-family:"Press Start 2P";
+  font-size: clamp(28px, 4.5vw, 72px);
+  color: var(--neon-pink);
+  text-shadow: 0 0 14px rgba(255,43,214,.85), 0 0 26px rgba(122,92,255,.6);
+  margin-top: 10px;
+}
+
+/* ====== Step Wrapper Sections ====== */
+section.step{
+  min-height:100vh; display:none;
+  align-items:center; justify-content:center; flex-direction:column;
+  padding:48px 24px; text-align:center;
+  position:relative; z-index:1;
+}
+section.step.active{display:flex}
+
+/* Choice grids */
+.choices,.districts,.adtypes,.subtypes{display:grid; gap:16px}
+.choices{grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); max-width:900px; width:100%}
+.districts,.adtypes,.subtypes{grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); max-width:1100px; width:100%}
+
+/* Cards */
+.card{
+  background:rgba(5,5,20,.55);
+  border:2px solid rgba(255,255,255,.15);
+  border-radius:14px;
+  padding:18px 16px;
+  cursor:pointer;
+  transition:.25s ease;
+  box-shadow:0 6px 26px rgba(0,0,0,.35), inset 0 0 20px rgba(255,255,255,.03);
+}
+.card:hover{
+  border-color:#00fff7; 
+  box-shadow:0 0 24px rgba(0,255,247,.35), inset 0 0 24px rgba(0,255,247,.12);
+  transform:translateY(-2px);
+}
+.card.active{
+  border-color:#ff2bd6; 
+  box-shadow:0 0 24px rgba(255,43,214,.45), inset 0 0 24px rgba(255,43,214,.15);
+}
+
+/* Buttons */
+.btn{
+  margin-top:22px; padding:14px 22px; border-radius:12px;
+  font-family:"Press Start 2P"; font-size:12px;
+  background:linear-gradient(90deg,#0e0a2a,#24125a);
+  color:var(--text); border:2px solid #00fff7;
+  box-shadow:0 0 16px rgba(0,255,247,.4), 0 0 32px rgba(122,92,255,.35);
+  cursor:pointer; transition:.2s;
+}
+.btn:hover{ transform:translateY(-1px); filter:saturate(1.2) }
+.btn.primary{ border-color:#ff2bd6; box-shadow:0 0 16px rgba(255,43,214,.5), 0 0 28px rgba(122,92,255,.35) }
+.btn.hide{ display:none }
+
+/* ====== Main App Layout ====== */
+header.app{
+  position:sticky; top:0; z-index:30;
+  padding:14px 18px; border-bottom:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg,rgba(10,5,32,.9),rgba(10,5,32,.65) 65%, transparent);
+  backdrop-filter: blur(10px);
+}
+.wrap{max-width:1260px; margin:0 auto; display:flex; gap:16px; align-items:center}
+.logo{
+  width:60px;height:60px;border-radius:12px; position:relative;
+  background: conic-gradient(from 0deg,#ff2bd6,#7a5cff,#00fff7,#ff9800,#ff2bd6);
+  box-shadow: 0 0 30px rgba(255,43,214,.6), inset 0 0 22px rgba(255,255,255,.25);
+}
+.logo::after{
+  content:"TT"; position:absolute; inset:0; display:grid; place-items:center;
+  font-family:"Press Start 2P"; font-size:18px; color:#0b0b12; text-shadow:0 0 8px #fff;
+}
+.pref-bar{max-width:1260px; margin:10px auto 0; padding:0 18px; display:flex; flex-wrap:wrap; gap:8px}
+.pill{font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.05)}
+
+main.app{max-width:1260px; margin:18px auto 60px; padding:0 18px}
+.grid{display:grid; grid-template-columns:1.1fr 1fr; grid-template-rows:auto auto; gap:18px}
+.panel{
+  border-radius:18px; padding:18px; position:relative; overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  border:2px solid rgba(255,255,255,.15);
+  box-shadow: 0 14px 36px rgba(0,0,0,.45), inset 0 0 34px rgba(255,255,255,.04);
+}
+.panel small{color:var(--muted)}
+#divA{grid-column:1;grid-row:1/span 2; border-color:var(--neon-pink); box-shadow:0 0 24px rgba(255,43,214,.35)}
+#divB{grid-column:2;grid-row:1; border-color:var(--neon-purple); box-shadow:0 0 24px rgba(122,92,255,.35)}
+#divC{grid-column:2;grid-row:2; border-color:var(--neon-blue); box-shadow:0 0 24px rgba(45,212,255,.35)}
+
+/* Tools */
+.tool-row{display:flex; gap:10px; align-items:center; margin:10px 0 14px; flex-wrap:wrap}
+.file-label, .glow-btn{
+  border:1px solid rgba(255,255,255,.25); padding:10px 12px; border-radius:10px; cursor:pointer; background:transparent; color:var(--text);
+}
+.file-label:hover,.glow-btn:hover{filter:brightness(1.12)}
+
+/* Elevations (Div A) */
+.elevations{display:grid; grid-template-columns:repeat(3,minmax(140px,1fr)); gap:12px}
+.elevation-card{background:rgba(122,92,255,.12); border:1px dashed rgba(255,255,255,.3); border-radius:12px; padding:12px; cursor:pointer}
+.elevation-card.active{outline:2px solid var(--neon-pink); box-shadow:0 0 18px rgba(255,43,214,.45)}
+.elevation-illus{height:110px; display:grid; place-items:center; background:rgba(0,0,0,.35); border-radius:8px; color:#d2d2ff}
+
+/* Map (Div B) */
+.map-wrap{display:grid; gap:12px}
+.map{height:260px; border-radius:16px; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,.15); background: radial-gradient(600px 260px at 50% 0%, rgba(0,255,247,.18), transparent 60%), rgba(5,5,20,.55)}
+/* Fallback abstract SVG (clickable) */
+svg#bkk{position:absolute; inset:12px; filter:drop-shadow(0 0 8px rgba(0,255,247,.35))}
+#bkk path{fill:rgba(0,255,247,.2); stroke:#00fff7; stroke-width:.9; transition:.2s}
+#bkk path:hover{fill:rgba(255,43,214,.35); stroke:#ff2bd6}
+.legend{display:flex; gap:8px; flex-wrap:wrap}
+.chip{font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.2)}
+.areas{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+.area-btn{padding:10px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); color:var(--text); text-align:left; cursor:pointer}
+.area-btn:hover{background:rgba(255,255,255,.1)}
+.map-tip{position:absolute; right:10px; bottom:10px; font-size:12px; background:rgba(0,0,0,.45); padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,.18)}
+
+/* Mockup (Div C) */
+.mock{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.tuktuk{position:relative; height:260px; border-radius:16px; background: radial-gradient(700px 260px at 15% 0%, rgba(45,212,255,.2), transparent 60%), rgba(5,5,20,.55); border:1px solid rgba(255,255,255,.15); overflow:hidden}
+.vehicle{position:absolute; inset:0; display:grid; place-items:center; opacity:.9}
+.vehicle::before{content:""; width:82%; height:60%; border-radius:16px; border:2px solid rgba(255,255,255,.2); box-shadow: inset 0 0 40px rgba(255,255,255,.07), 0 0 18px rgba(122,92,255,.35)}
+.ad-slot{position:absolute; border:2px dashed rgba(255,255,255,.45); border-radius:8px; box-shadow:0 0 12px rgba(255,255,255,.22)}
+.slot-side{width:44%; height:28%; left:28%; bottom:18%}
+.slot-front{width:32%; height:18%; left:34%; top:18%}
+.slot-back{width:36%; height:20%; right:12%; bottom:20%}
+.ad-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:6px; display:none}
+.details{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); border-radius:12px; padding:12px}
+
+/* 3D viewer styling */
+model-viewer{
+  width:100%;
+  height:420px;
+  background: radial-gradient(800px 300px at 50% 0%, rgba(255,43,214,.08), transparent 60%), rgba(8,8,20,.8);
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow: inset 0 0 24px rgba(255,255,255,.04);
+}
+
+/* Responsive */
+@media (max-width:980px){
+  .grid{grid-template-columns:1fr}
+  #divA,#divB,#divC{grid-row:auto}
+  .mock{grid-template-columns:1fr}
+}
+
+/* Ensure Div C buttons use the retro font */
+#divC .glow-btn {
+  font-family: "Press Start 2P", system-ui, sans-serif;
+}
+</style>
+</head>
+
+<!-- Pixel background elements -->
+<div class="pixel-moon"></div>
+<div class="pixel-cloud cloud1"></div>
+<div class="pixel-cloud cloud2"></div>
+<div class="pixel-cloud cloud3"></div>
+
+<!-- ===== STEP 1 ===== -->
+<section id="step1" class="step active">
+  <h1 class="retro-title">AdRide TukTuk</h1>
+  <div class="press-start">PRESS START</div>
+  <p class="retro-sub">Pick your <strong>top 3</strong> favourite categories so we can match TukTuk routes with your audience.</p>
+  <div class="choices" id="choices"></div>
+  <div>
+    <button class="btn" id="resetInterests">Reset</button>
+    <button class="btn primary hide" id="toStep2">Continue ▶</button>
+  </div>
+</section>
+
+<!-- ===== STEP 2 ===== -->
+<section id="step2" class="step">
+  <h1 class="retro-title">SELECT YOUR DISTRICT</h1>
+  <p class="retro-sub">Choose where you live in Bangkok to personalize route matches.</p>
+  <div class="districts" id="districts"></div>
+  <div>
+    <button class="btn" id="backTo1">◀ Back</button>
+    <button class="btn primary hide" id="toStep3">Next ▶</button>
+  </div>
+</section>
+
+<!-- ===== STEP 3 — AD TOPICS ===== -->
+<section id="step3" class="step">
+  <h1 class="retro-title">SELECT YOUR AD TYPE</h1>
+  <p class="retro-sub">Pick a category, then a specific item to promote on your TukTuk.</p>
+  <div class="adtypes" id="adTypes"></div>
+  <div style="margin-top:16px; max-width:1100px; width:100%;">
+    <div id="subTypeWrap" class="subtypes"></div>
+  </div>
+  <div>
+    <button class="btn" id="backTo2">◀ Back</button>
+    <button class="btn primary hide" id="toStep4">Go to Main ▶</button>
+  </div>
+</section>
+
+<!-- ===== STEP 4 — MAIN APP ===== -->
+<section id="app" class="step">
+  <header class="app">
+    <div class="wrap">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h2 style="margin:0">TukTuk AdRide</h2>
+        <div class="tag" style="color:#c7c7ff">Neon-bright TukTuk billboard ads across Bangkok</div>
+      </div>
+    </div>
+    <div class="pref-bar" id="prefBar"></div>
+  </header>
+
+  <main class="app">
+    <div class="grid">
+      <!-- A -->
+      <section id="divA" class="panel">
+        <h3>A · TukTuk 3D Preview + Templates</h3>
+        <small>Rotate, zoom, and inspect your TukTuk model. Upload your artwork below for 2D mockups.</small>
+
+        <!-- 3D TukTuk preview -->
+        <model-viewer id="tuktuk3D"
+          src="TukTuk.glb"
+          alt="3D TukTuk"
+          camera-controls
+          auto-rotate
+          shadow-intensity="0.9"
+          touch-action="pan-y"
+          ar
+        ></model-viewer>
+
+        <div class="tool-row">
+          <label for="fileInput" class="file-label">Upload Artwork</label>
+          <!-- <input id="fileInput" type="file" accept="image/*" /> -->
+          <input type="file" id="uploadAds1" accept="image/*">
+          <input type="file" id="uploadAds2" accept="image/*">
+          <input type="file" id="uploadAds3" accept="image/*">
+
+          <button class="glow-btn" id="clearArt">Clear</button>
+        </div>
+
+        
+        <div class="elevations">
+          <article class="elevation-card active" data-slot="side">
+            <div class="elevation-illus">
+              <img id="card-side" style="max-width:100%;display:none;" alt="Side Elevation">
+            </div>
+            <small>Large 80×50 cm</small>
+          </article>
+          <article class="elevation-card" data-slot="front">
+            <div class="elevation-illus">
+              <img id="card-front" style="max-width:100%;display:none;" alt="Front Elevation">
+            </div>
+            <small>100×20 cm</small>
+          </article>
+          <article class="elevation-card" data-slot="back">
+            <div class="elevation-illus">
+              <img id="card-back" style="max-width:100%;display:none;" alt="Back Elevation">
+            </div>
+            <small>50×20 cm</small>
+          </article>
+        </div>
+
+
+
+
+      </section>
+
+      <!-- B -->
+     <!-- B -->
+<section id="divB" class="panel">
+  <h3>B · Real-time Bangkok Map & Target Match</h3>
+  <small>Hover the map or pick an area.</small>
+  <div class="map-wrap">
+    <div class="map">
+      <!-- Replace SVG with Bangkok PNG map -->
+      <img src="Blank_Bangkok_Map.svg.png" alt="Bangkok Map"
+           style="width:100%;height:100%;object-fit:contain;">
+      <div class="map-tip" id="mapTip">Bangkok Map</div>
+    </div>
+    <div class="legend">
+      <span class="chip" style="border-color:#22f7a8">High match</span>
+      <span class="chip" style="border-color:#7a5cff">Medium</span>
+      <span class="chip" style="border-color:#ff2bd6">Emerging</span>
+    </div>
+    <div class="areas" id="areas"></div>
+  </div>
+</section>
+
+      <!-- C -->
+<section id="divC" class="panel">
+  <h3>C · Advertisement Pricing</h3>
+  <small>Click a district in the map above to see pricing details.</small>
+  <div class="mock">
+    <div class="details">
+      <h4 style="margin:0 0 12px; color: var(--neon-green);">Selected District</h4>
+      <div id="selectedDistrictName" style="font-size:18px;color:var(--text);margin-bottom:16px;">No district selected</div>
+      
+      <div id="pricingDetails" style="display:none;">
+        <h4 style="margin:0 0 8px; color: var(--neon-blue);">Ad Placement Pricing</h4>
+        <div class="pricing-grid" style="display:grid;gap:8px;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;padding:8px;background:rgba(255,255,255,0.05);border-radius:8px;">
+            <span>Side Panel (80×50 cm):</span>
+            <span id="sidePanelPrice" style="color:var(--neon-green);">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px;background:rgba(255,255,255,0.05);border-radius:8px;">
+            <span>Front Panel (100×20 cm):</span>
+            <span id="frontPanelPrice" style="color:var(--neon-green);">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px;background:rgba(255,255,255,0.05);border-radius:8px;">
+            <span>Back Panel (50×20 cm):</span>
+            <span id="backPanelPrice" style="color:var(--neon-green);">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px;background:rgba(255,43,214,0.15);border-radius:8px;border:1px solid var(--neon-pink);margin-top:8px;">
+            <strong>Full Package:</strong>
+            <strong id="fullPackagePrice" style="color:var(--neon-pink);">—</strong>
+          </div>
+        </div>
+        
+        <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">
+          Match Score: <span id="matchScore" style="color:var(--neon-green);">—</span>% 
+          · Target Audience: <span id="targetAudience">—</span>
+        </div>
+      </div>
+
+      <div class="tool-row" style="margin-top:12px">
+        <button class="glow-btn" id="rentBtn">Rent This TukTuk</button>
+        <button class="glow-btn" id="downloadBtn">Download Mockup</button>
+      </div>
+    </div>
+  </div>
+</section>
+    </div>
+  </main>
+</section>
+
+<script>
+/* ---------- Utility ---------- */
+function activateStep(id){
+  document.querySelectorAll('section.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function capitalize(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
+
+const mv = document.getElementById('tuktuk3D');
+
+async function bindTexture(inputId, matName, cardImgId){
+  const input=document.getElementById(inputId);
+  input.addEventListener('change',async e=>{
+    const f=e.target.files?.[0];if(!f)return;
+    const url=URL.createObjectURL(f);
+    await mv.updateComplete;
+    const m=mv.model?.materials.find(x=>x.name===matName);
+    if(m){
+      const t=await mv.createTexture(url);
+      m.pbrMetallicRoughness.baseColorTexture.setTexture(t);
+      m.pbrMetallicRoughness.setBaseColorFactor([1,1,1,1]);
+    }
+    const img=document.getElementById(cardImgId);
+    if(img){img.src=url;img.style.display='block';}
+  });
+}
+
+mv.addEventListener('load',async()=>{
+  ['ads1','ads2','ads3'].forEach(n=>{
+    const m=mv.model?.materials.find(x=>x.name===n);
+    if(m){
+      m.pbrMetallicRoughness.baseColorTexture.setTexture(null);
+      m.pbrMetallicRoughness.setBaseColorFactor([1,1,1,1]);
+    }
+  });
+  ['card-side','card-front','card-back'].forEach(id=>{
+    const img=document.getElementById(id);
+    if(img){img.removeAttribute('src');img.style.display='none';}
+  });
+});
+
+bindTexture('uploadAds1','ads1','card-side');
+bindTexture('uploadAds2','ads2','card-front');
+bindTexture('uploadAds3','ads3','card-back');
+
+document.getElementById('clearArt').addEventListener('click',async()=>{
+  await mv.updateComplete;
+  ['ads1','ads2','ads3'].forEach(n=>{
+    const m=mv.model?.materials.find(x=>x.name===n);
+    if(m){
+      m.pbrMetallicRoughness.baseColorTexture.setTexture(null);
+      m.pbrMetallicRoughness.setBaseColorFactor([1,1,1,1]);
+    }
+  });
+  ['uploadAds1','uploadAds2','uploadAds3'].forEach(id=>{
+    const input=document.getElementById(id);
+    if(input) input.value='';
+  });
+  ['card-side','card-front','card-back'].forEach(id=>{
+    const img=document.getElementById(id);
+    if(img){img.removeAttribute('src');img.style.display='none';}
+  });
+});
+
+// Clear all textures
+document.getElementById('clearArt').addEventListener('click', async () => {
+  await mv.updateComplete;
+  ['ads1','ads2','ads3'].forEach(name => {
+    const mat = mv.model?.materials.find(m => m.name === name);
+    if (mat) {
+      mat.pbrMetallicRoughness.baseColorTexture.setTexture(null);
+      mat.pbrMetallicRoughness.setBaseColorFactor([1,1,1,1]); // reset to plain white
+    }
+  });
+});
+if(mv){
+  mv.addEventListener('error', () => {
+    console.warn('Could not load TukTuk.glb. Ensure the file is in the same folder as this HTML and the name matches.');
+  });
+}
+
+/* ---------- Step 1: Interests ---------- */
+const INTERESTS = ['Movies','Food','Clothes','Music','Tech','Sports','Beauty','Gaming','Travel','Books','Pets','Fitness'];
+const choicesWrap = document.getElementById('choices');
+const toStep2Btn = document.getElementById('toStep2');
+const resetInterestsBtn = document.getElementById('resetInterests');
+let selectedInterests = [];
+
+INTERESTS.forEach(n=>{
+  const el=document.createElement('div');
+  el.className='card'; el.textContent=n; el.dataset.name=n;
+  el.addEventListener('click',()=>{
+    if(el.classList.contains('active')){
+      el.classList.remove('active');
+      selectedInterests = selectedInterests.filter(x=>x!==n);
+    }else if(selectedInterests.length<3){
+      el.classList.add('active');
+      selectedInterests.push(n);
+    }
+    toStep2Btn.classList.toggle('hide', selectedInterests.length!==3);
+  });
+  choicesWrap.appendChild(el);
+});
+
+resetInterestsBtn.addEventListener('click', ()=>{
+  selectedInterests=[];
+  document.querySelectorAll('#choices .card').forEach(c=>c.classList.remove('active'));
+  toStep2Btn.classList.add('hide');
+});
+toStep2Btn.addEventListener('click', ()=> activateStep('step2'));
+
+/* ---------- Step 2: District (50) ---------- */
+const DISTRICTS = [
+ 'Phra Nakhon','Dusit','Nong Chok','Bang Rak','Bang Khen','Bang Kapi','Pathum Wan','Pom Prap Sattru Phai',
+ 'Phaya Thai','Thon Buri','Bangkok Yai','Huai Khwang','Khlong San','Taling Chan','Bangkok Noi','Bang Khun Thian',
+ 'Phasi Charoen','Nong Khaem','Rat Burana','Bang Phlat','Din Daeng','Bueng Kum','Sathon','Bang Sue','Chatuchak',
+ 'Bang Kho Laem','Prawet','Khlong Toei','Suan Luang','Chom Thong','Don Mueang','Ratchathewi','Lat Phrao','Watthana',
+ 'Bang Khae','Lak Si','Sai Mai','Khan Na Yao','Saphan Sung','Wang Thonglang','Khlong Sam Wa','Bang Na',
+ 'Thawi Watthana','Thung Khru','Bang Bon','Lat Krabang','Yan Nawa','Samphanthawong','Phra Khanong','Min Buri'
+];
+const districtsWrap = document.getElementById('districts');
+const toStep3Btn = document.getElementById('toStep3');
+document.getElementById('backTo1').addEventListener('click', ()=> activateStep('step1'));
+let selectedDistrict=null;
+
+DISTRICTS.forEach(d=>{
+  const el=document.createElement('div'); el.className='card'; el.textContent=d;
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('#districts .card').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active'); selectedDistrict=d; toStep3Btn.classList.remove('hide');
+  });
+  districtsWrap.appendChild(el);
+});
+toStep3Btn.addEventListener('click', ()=> activateStep('step3'));
+
+/* ---------- Step 3: Ad Topics + Sub-items ---------- */
+const AD_TOPICS = {
+  "Food & Beverage": [
+    "Thai Food","Japanese Food","Fast Food Chains","Street Food Vendors",
+    "Coffee Shops","Bubble Tea / Milk Tea","Juice & Smoothies","Alcohol & Bars"
+  ],
+  "Fashion & Lifestyle": [
+    "Clothes (Casual, Luxury, Streetwear)","Shoes & Sneakers","Cosmetics & Beauty Products",
+    "Jewelry & Accessories","Fitness & Sportswear"
+  ],
+  "Services": [
+    "Barber Shop / Salon","Spa & Massage","Delivery Services","Ride-Hailing Apps",
+    "Mobile Applications","Financial Services"
+  ],
+  "Entertainment": [
+    "Movies & Streaming","Gaming (PC, Console, Mobile)","Concerts & Events","Nightclubs & Pubs"
+  ],
+  "Technology & Gadgets": [
+    "Smartphones","Laptops & Tablets","Smart Home Devices","E-commerce Platforms"
+  ],
+  "Travel & Leisure": [
+    "Airlines","Hotels","Tours & Activities","Theme Parks"
+  ]
+};
+
+const adTypesWrap=document.getElementById('adTypes');
+const subTypeWrap=document.getElementById('subTypeWrap');
+const toStep4Btn=document.getElementById('toStep4');
+document.getElementById('backTo2').addEventListener('click', ()=> activateStep('step2'));
+let selectedAdCategory=null, selectedAdSubItem=null;
+
+Object.entries(AD_TOPICS).forEach(([cat,items])=>{
+  const el=document.createElement('div');
+  el.className='card';
+  el.innerHTML=`<strong>${cat}</strong><br><small>${items.slice(0,3).join(", ")}…</small>`;
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('#adTypes .card').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    selectedAdCategory=cat; selectedAdSubItem=null;
+    toStep4Btn.classList.add('hide');
+    renderSubTypes(cat);
+  });
+  adTypesWrap.appendChild(el);
+});
+
+function renderSubTypes(category){
+  subTypeWrap.innerHTML='';
+  AD_TOPICS[category].forEach(item=>{
+    const s=document.createElement('div');
+    s.className='card';
+    s.textContent=item;
+    s.addEventListener('click',()=>{
+      document.querySelectorAll('#subTypeWrap .card').forEach(x=>x.classList.remove('active'));
+      s.classList.add('active');
+      selectedAdSubItem=item;
+      toStep4Btn.classList.remove('hide');
+    });
+    subTypeWrap.appendChild(s);
+  });
+}
+
+toStep4Btn.addEventListener('click', ()=> { activateStep('app'); personalizeUI(); });
+
+/* ---------- Main App Personalization + Logic ---------- */
+const prefBar = document.getElementById('prefBar');
+// Replace the AREAS array with this complete 50-district version:
+
+const AREAS = [
+  // Premium Central Districts (Highest pricing)
+  {
+    name:'Pathum Wan', baseMatch:75, price:'3,200 THB/mo',
+    sidePanelPrice: '1,600 THB/mo', frontPanelPrice: '1,000 THB/mo', backPanelPrice: '800 THB/mo',
+    fullPackage: '3,200 THB/mo', targetAudience: 'Premium shoppers, tourists, luxury consumers'
+  },
+  {
+    name:'Bang Rak', baseMatch:73, price:'3,100 THB/mo',
+    sidePanelPrice: '1,550 THB/mo', frontPanelPrice: '950 THB/mo', backPanelPrice: '750 THB/mo',
+    fullPackage: '3,100 THB/mo', targetAudience: 'Business elite, financial district workers, expats'
+  },
+  {
+    name:'Sathon', baseMatch:72, price:'3,000 THB/mo',
+    sidePanelPrice: '1,500 THB/mo', frontPanelPrice: '900 THB/mo', backPanelPrice: '700 THB/mo',
+    fullPackage: '3,000 THB/mo', targetAudience: 'Corporate executives, high-end professionals'
+  },
+
+  // Major Tourist & Shopping Areas
+  {
+    name:'Phra Nakhon', baseMatch:78, price:'2,900 THB/mo',
+    sidePanelPrice: '1,450 THB/mo', frontPanelPrice: '850 THB/mo', backPanelPrice: '650 THB/mo',
+    fullPackage: '2,900 THB/mo', targetAudience: 'International tourists, cultural visitors'
+  },
+  {
+    name:'Chatuchak', baseMatch:76, price:'2,600 THB/mo',
+    sidePanelPrice: '1,300 THB/mo', frontPanelPrice: '800 THB/mo', backPanelPrice: '600 THB/mo',
+    fullPackage: '2,600 THB/mo', targetAudience: 'Weekend shoppers, young locals, tourists'
+  },
+  {
+    name:'Watthana', baseMatch:74, price:'2,800 THB/mo',
+    sidePanelPrice: '1,400 THB/mo', frontPanelPrice: '850 THB/mo', backPanelPrice: '650 THB/mo',
+    fullPackage: '2,800 THB/mo', targetAudience: 'Affluent residents, shopping district visitors'
+  },
+
+  // Business & Commercial Districts
+  {
+    name:'Huai Khwang', baseMatch:68, price:'2,400 THB/mo',
+    sidePanelPrice: '1,200 THB/mo', frontPanelPrice: '750 THB/mo', backPanelPrice: '550 THB/mo',
+    fullPackage: '2,400 THB/mo', targetAudience: 'Office workers, commuters, business travelers'
+  },
+  {
+    name:'Din Daeng', baseMatch:65, price:'2,300 THB/mo',
+    sidePanelPrice: '1,150 THB/mo', frontPanelPrice: '700 THB/mo', backPanelPrice: '500 THB/mo',
+    fullPackage: '2,300 THB/mo', targetAudience: 'Government workers, civil servants, locals'
+  },
+  {
+    name:'Ratchathewi', baseMatch:67, price:'2,500 THB/mo',
+    sidePanelPrice: '1,250 THB/mo', frontPanelPrice: '750 THB/mo', backPanelPrice: '550 THB/mo',
+    fullPackage: '2,500 THB/mo', targetAudience: 'Shopping center visitors, urban professionals'
+  },
+  {
+    name:'Phaya Thai', baseMatch:66, price:'2,400 THB/mo',
+    sidePanelPrice: '1,200 THB/mo', frontPanelPrice: '750 THB/mo', backPanelPrice: '550 THB/mo',
+    fullPackage: '2,400 THB/mo', targetAudience: 'Students, tech workers, young professionals'
+  },
+
+  // Popular Residential & Mixed Areas
+  {
+    name:'Bang Kapi', baseMatch:71, price:'2,200 THB/mo',
+    sidePanelPrice: '1,100 THB/mo', frontPanelPrice: '700 THB/mo', backPanelPrice: '500 THB/mo',
+    fullPackage: '2,200 THB/mo', targetAudience: 'Local families, food enthusiasts, residents'
+  },
+  {
+    name:'Lat Phrao', baseMatch:69, price:'2,100 THB/mo',
+    sidePanelPrice: '1,050 THB/mo', frontPanelPrice: '650 THB/mo', backPanelPrice: '450 THB/mo',
+    fullPackage: '2,100 THB/mo', targetAudience: 'Middle-class families, local shoppers'
+  },
+  {
+    name:'Wang Thonglang', baseMatch:64, price:'2,000 THB/mo',
+    sidePanelPrice: '1,000 THB/mo', frontPanelPrice: '650 THB/mo', backPanelPrice: '450 THB/mo',
+    fullPackage: '2,000 THB/mo', targetAudience: 'Suburban families, local commuters'
+  },
+  {
+    name:'Saphan Sung', baseMatch:63, price:'1,950 THB/mo',
+    sidePanelPrice: '975 THB/mo', frontPanelPrice: '625 THB/mo', backPanelPrice: '425 THB/mo',
+    fullPackage: '1,950 THB/mo', targetAudience: 'Working class families, local businesses'
+  },
+  {
+    name:'Bueng Kum', baseMatch:62, price:'1,900 THB/mo',
+    sidePanelPrice: '950 THB/mo', frontPanelPrice: '600 THB/mo', backPanelPrice: '400 THB/mo',
+    fullPackage: '1,900 THB/mo', targetAudience: 'Residential communities, local markets'
+  },
+
+  // Riverside & Historic Areas
+  {
+    name:'Khlong San', baseMatch:61, price:'2,300 THB/mo',
+    sidePanelPrice: '1,150 THB/mo', frontPanelPrice: '700 THB/mo', backPanelPrice: '500 THB/mo',
+    fullPackage: '2,300 THB/mo', targetAudience: 'River tourists, cultural visitors, locals'
+  },
+  {
+    name:'Thon Buri', baseMatch:65, price:'2,200 THB/mo',
+    sidePanelPrice: '1,100 THB/mo', frontPanelPrice: '700 THB/mo', backPanelPrice: '500 THB/mo',
+    fullPackage: '2,200 THB/mo', targetAudience: 'Historic district visitors, local residents'
+  },
+  {
+    name:'Bangkok Yai', baseMatch:60, price:'2,000 THB/mo',
+    sidePanelPrice: '1,000 THB/mo', frontPanelPrice: '650 THB/mo', backPanelPrice: '450 THB/mo',
+    fullPackage: '2,000 THB/mo', targetAudience: 'Traditional communities, cultural tourists'
+  },
+  {
+    name:'Bangkok Noi', baseMatch:59, price:'1,950 THB/mo',
+    sidePanelPrice: '975 THB/mo', frontPanelPrice: '625 THB/mo', backPanelPrice: '425 THB/mo',
+    fullPackage: '1,950 THB/mo', targetAudience: 'Local communities, temple visitors'
+  },
+  {
+    name:'Dusit', baseMatch:64, price:'2,100 THB/mo',
+    sidePanelPrice: '1,050 THB/mo', frontPanelPrice: '650 THB/mo', backPanelPrice: '450 THB/mo',
+    fullPackage: '2,100 THB/mo', targetAudience: 'Government district workers, tourists'
+  },
+
+  // Northern Districts
+  {
+    name:'Don Mueang', baseMatch:58, price:'1,800 THB/mo',
+    sidePanelPrice: '900 THB/mo', frontPanelPrice: '575 THB/mo', backPanelPrice: '375 THB/mo',
+    fullPackage: '1,800 THB/mo', targetAudience: 'Airport travelers, aviation workers'
+  },
+  {
+    name:'Bang Khen', baseMatch:57, price:'1,750 THB/mo',
+    sidePanelPrice: '875 THB/mo', frontPanelPrice: '550 THB/mo', backPanelPrice: '350 THB/mo',
+    fullPackage: '1,750 THB/mo', targetAudience: 'Suburban residents, commuters'
+  },
+  {
+    name:'Lak Si', baseMatch:55, price:'1,700 THB/mo',
+    sidePanelPrice: '850 THB/mo', frontPanelPrice: '525 THB/mo', backPanelPrice: '325 THB/mo',
+    fullPackage: '1,700 THB/mo', targetAudience: 'Local families, market visitors'
+  },
+  {
+    name:'Bang Sue', baseMatch:61, price:'2,000 THB/mo',
+    sidePanelPrice: '1,000 THB/mo', frontPanelPrice: '650 THB/mo', backPanelPrice: '450 THB/mo',
+    fullPackage: '2,000 THB/mo', targetAudience: 'Railway hub users, commuters'
+  },
+  {
+    name:'Sai Mai', baseMatch:54, price:'1,650 THB/mo',
+    sidePanelPrice: '825 THB/mo', frontPanelPrice: '500 THB/mo', backPanelPrice: '300 THB/mo',
+    fullPackage: '1,650 THB/mo', targetAudience: 'Outer suburb residents, local businesses'
+  },
+
+  // Eastern Districts
+  {
+    name:'Khlong Toei', baseMatch:70, price:'2,500 THB/mo',
+    sidePanelPrice: '1,250 THB/mo', frontPanelPrice: '750 THB/mo', backPanelPrice: '550 THB/mo',
+    fullPackage: '2,500 THB/mo', targetAudience: 'Port workers, logistics, diverse communities'
+  },
+  {
+    name:'Phra Khanong', baseMatch:68, price:'2,300 THB/mo',
+    sidePanelPrice: '1,150 THB/mo', frontPanelPrice: '700 THB/mo', backPanelPrice: '500 THB/mo',
+    fullPackage: '2,300 THB/mo', targetAudience: 'Hip neighborhoods, young professionals'
+  },
+  {
+    name:'Bang Na', baseMatch:66, price:'2,100 THB/mo',
+    sidePanelPrice: '1,050 THB/mo', frontPanelPrice: '650 THB/mo', backPanelPrice: '450 THB/mo',
+    fullPackage: '2,100 THB/mo', targetAudience: 'Suburban families, shopping centers'
+  },
+  {
+    name:'Prawet', baseMatch:63, price:'1,900 THB/mo',
+    sidePanelPrice: '950 THB/mo', frontPanelPrice: '600 THB/mo', backPanelPrice: '400 THB/mo',
+    fullPackage: '1,900 THB/mo', targetAudience: 'Residential areas, local markets'
+  },
+  {
+    name:'Suan Luang', baseMatch:64, price:'2,000 THB/mo',
+    sidePanelPrice: '1,000 THB/mo', frontPanelPrice: '650 THB/mo', backPanelPrice: '450 THB/mo',
+    fullPackage: '2,000 THB/mo', targetAudience: 'Park visitors, middle-class families'
+  },
+  {
+    name:'Lat Krabang', baseMatch:60, price:'1,850 THB/mo',
+    sidePanelPrice: '925 THB/mo', frontPanelPrice: '575 THB/mo', backPanelPrice: '375 THB/mo',
+    fullPackage: '1,850 THB/mo', targetAudience: 'Airport area, logistics workers'
+  },
+  {
+    name:'Khlong Sam Wa', baseMatch:56, price:'1,700 THB/mo',
+    sidePanelPrice: '850 THB/mo', frontPanelPrice: '525 THB/mo', backPanelPrice: '325 THB/mo',
+    fullPackage: '1,700 THB/mo', targetAudience: 'Outer residential, agricultural areas'
+  },
+  {
+    name:'Nong Chok', baseMatch:52, price:'1,500 THB/mo',
+    sidePanelPrice: '750 THB/mo', frontPanelPrice: '475 THB/mo', backPanelPrice: '275 THB/mo',
+    fullPackage: '1,500 THB/mo', targetAudience: 'Rural communities, agricultural workers'
+  },
+  {
+    name:'Min Buri', baseMatch:55, price:'1,650 THB/mo',
+    sidePanelPrice: '825 THB/mo', frontPanelPrice: '500 THB/mo', backPanelPrice: '300 THB/mo',
+    fullPackage: '1,650 THB/mo', targetAudience: 'Suburban families, local communities'
+  },
+  {
+    name:'Khan Na Yao', baseMatch:57, price:'1,750 THB/mo',
+    sidePanelPrice: '875 THB/mo', frontPanelPrice: '550 THB/mo', backPanelPrice: '350 THB/mo',
+    fullPackage: '1,750 THB/mo', targetAudience: 'Growing suburbs, young families'
+  },
+
+  // Southern Districts
+  {
+    name:'Yan Nawa', baseMatch:67, price:'2,200 THB/mo',
+    sidePanelPrice: '1,100 THB/mo', frontPanelPrice: '700 THB/mo', backPanelPrice: '500 THB/mo',
+    fullPackage: '2,200 THB/mo', targetAudience: 'Modern condos, business travelers'
+  },
+  {
+    name:'Bang Kho Laem', baseMatch:65, price:'2,100 THB/mo',
+    sidePanelPrice: '1,050 THB/mo', frontPanelPrice: '650 THB/mo', backPanelPrice: '450 THB/mo',
+    fullPackage: '2,100 THB/mo', targetAudience: 'Riverside communities, culture seekers'
+  },
+  {
+    name:'Chom Thong', baseMatch:59, price:'1,800 THB/mo',
+    sidePanelPrice: '900 THB/mo', frontPanelPrice: '575 THB/mo', backPanelPrice: '375 THB/mo',
+    fullPackage: '1,800 THB/mo', targetAudience: 'Traditional neighborhoods, local families'
+  },
+  {
+    name:'Thung Khru', baseMatch:58, price:'1,750 THB/mo',
+    sidePanelPrice: '875 THB/mo', frontPanelPrice: '550 THB/mo', backPanelPrice: '350 THB/mo',
+    fullPackage: '1,750 THB/mo', targetAudience: 'Residential areas, commuting families'
+  },
+  {
+    name:'Rat Burana', baseMatch:56, price:'1,700 THB/mo',
+    sidePanelPrice: '850 THB/mo', frontPanelPrice: '525 THB/mo', backPanelPrice: '325 THB/mo',
+    fullPackage: '1,700 THB/mo', targetAudience: 'Local communities, market shoppers'
+  },
+  {
+    name:'Bang Khun Thian', baseMatch:54, price:'1,600 THB/mo',
+    sidePanelPrice: '800 THB/mo', frontPanelPrice: '500 THB/mo', backPanelPrice: '300 THB/mo',
+    fullPackage: '1,600 THB/mo', targetAudience: 'Coastal communities, local residents'
+  },
+  {
+    name:'Bang Bon', baseMatch:53, price:'1,550 THB/mo',
+    sidePanelPrice: '775 THB/mo', frontPanelPrice: '475 THB/mo', backPanelPrice: '275 THB/mo',
+    fullPackage: '1,550 THB/mo', targetAudience: 'Industrial workers, local communities'
+  },
+
+  // Western Districts
+  {
+    name:'Phasi Charoen', baseMatch:60, price:'1,900 THB/mo',
+    sidePanelPrice: '950 THB/mo', frontPanelPrice: '600 THB/mo', backPanelPrice: '400 THB/mo',
+    fullPackage: '1,900 THB/mo', targetAudience: 'Mixed residential, local businesses'
+  },
+  {
+    name:'Bang Khae', baseMatch:58, price:'1,800 THB/mo',
+    sidePanelPrice: '900 THB/mo', frontPanelPrice: '575 THB/mo', backPanelPrice: '375 THB/mo',
+    fullPackage: '1,800 THB/mo', targetAudience: 'Suburban families, local markets'
+  },
+  {
+    name:'Nong Khaem', baseMatch:55, price:'1,650 THB/mo',
+    sidePanelPrice: '825 THB/mo', frontPanelPrice: '500 THB/mo', backPanelPrice: '300 THB/mo',
+    fullPackage: '1,650 THB/mo', targetAudience: 'Working class families, local shops'
+  },
+  {
+    name:'Bang Phlat', baseMatch:57, price:'1,750 THB/mo',
+    sidePanelPrice: '875 THB/mo', frontPanelPrice: '550 THB/mo', backPanelPrice: '350 THB/mo',
+    fullPackage: '1,750 THB/mo', targetAudience: 'Historic communities, local residents'
+  },
+  {
+    name:'Taling Chan', baseMatch:59, price:'1,850 THB/mo',
+    sidePanelPrice: '925 THB/mo', frontPanelPrice: '575 THB/mo', backPanelPrice: '375 THB/mo',
+    fullPackage: '1,850 THB/mo', targetAudience: 'Floating market visitors, tourists'
+  },
+  {
+    name:'Thawi Watthana', baseMatch:56, price:'1,700 THB/mo',
+    sidePanelPrice: '850 THB/mo', frontPanelPrice: '525 THB/mo', backPanelPrice: '325 THB/mo',
+    fullPackage: '1,700 THB/mo', targetAudience: 'Outer suburbs, growing communities'
+  },
+
+  // Historic Central Areas
+  {
+    name:'Samphanthawong', baseMatch:68, price:'2,400 THB/mo',
+    sidePanelPrice: '1,200 THB/mo', frontPanelPrice: '750 THB/mo', backPanelPrice: '550 THB/mo',
+    fullPackage: '2,400 THB/mo', targetAudience: 'Chinatown visitors, cultural tourists'
+  },
+  {
+    name:'Pom Prap Sattru Phai', baseMatch:66, price:'2,200 THB/mo',
+    sidePanelPrice: '1,100 THB/mo', frontPanelPrice: '700 THB/mo', backPanelPrice: '500 THB/mo',
+    fullPackage: '2,200 THB/mo', targetAudience: 'Historic district, local businesses'
+  }
+];
+let currentArea=null, currentElevation='side';
+
+function personalizeUI(){
+  // Show chosen prefs
+  prefBar.innerHTML='';
+  selectedInterests.forEach(i=>{
+    const p=document.createElement('span'); p.className='pill'; p.textContent='Interest: '+i; prefBar.appendChild(p);
+  });
+  if(selectedDistrict){ const p=document.createElement('span'); p.className='pill'; p.textContent='District: '+selectedDistrict; prefBar.appendChild(p); }
+  if(selectedAdCategory){
+    const p=document.createElement('span'); p.className='pill'; p.textContent='Ad: '+selectedAdCategory+(selectedAdSubItem?(' — '+selectedAdSubItem):''); prefBar.appendChild(p);
+  }
+
+  // Simple matching logic boost
+  const boost = mapToArea(selectedDistrict, selectedAdCategory, selectedAdSubItem);
+  AREAS.forEach(a=> a.match = a.baseMatch + (a.name===boost ? 18 : 0));
+  renderAreaButtons();
+  if(AREAS.length > 0) {
+  selectArea(AREAS[0].name);
+}
+}
+
+function mapToArea(district, cat, sub){
+  if(cat && cat.includes('Travel')) return 'Lat Krabang';
+  if(cat && cat.includes('Technology')) return 'Phaya Thai';
+  if(cat && cat.includes('Fashion')) return 'Chatuchak';
+  if(cat && cat.includes('Services')) return 'Sathon';
+  if(cat && cat.includes('Food')) return 'Bang Kapi';
+  if(district && district.includes('Bangkok Noi')) return 'Bangkok Noi';
+  return 'Chatuchak';
+}
+
+const areasEl=document.getElementById('areas');
+function renderAreaButtons(){
+  areasEl.innerHTML='';
+  AREAS.forEach(a=>{
+    const b=document.createElement('button');
+    b.className='area-btn';
+    b.innerHTML=`<strong>${a.name}</strong><br><small>${a.match}% match · ${a.price}</small>`;
+    b.addEventListener('click',()=>selectArea(a.name));
+    areasEl.appendChild(b);
+  });
+
+  // SVG hover/tooltips
+  const svg = document.getElementById('bkk');
+  if(svg){
+    svg.querySelectorAll('path').forEach(p=>{
+      p.addEventListener('mousemove',()=>{
+        const r=AREAS.find(x=>x.name===p.dataset.name);
+        if(r) document.getElementById('mapTip').textContent = `${r.name} · Match: ${r.match}% · ${r.price}`;
+      });
+      p.addEventListener('mouseleave',()=> document.getElementById('mapTip').textContent='Hover an area · Match: —');
+      p.addEventListener('click',()=> selectArea(p.dataset.name));
+    });
+  }
+}
+
+function selectArea(name){
+  currentArea = AREAS.find(a=>a.name===name) || null;
+  updateDistrictPricing();
+  updateSelection();
+}
+
+function updateDistrictPricing(){
+  const selectedName = document.getElementById('selectedDistrictName');
+  const pricingDetails = document.getElementById('pricingDetails');
+  
+  if(currentArea){
+    selectedName.textContent = currentArea.name;
+    selectedName.style.color = 'var(--neon-pink)';
+    
+    document.getElementById('sidePanelPrice').textContent = currentArea.sidePanelPrice;
+    document.getElementById('frontPanelPrice').textContent = currentArea.frontPanelPrice;
+    document.getElementById('backPanelPrice').textContent = currentArea.backPanelPrice;
+    document.getElementById('fullPackagePrice').textContent = currentArea.fullPackage;
+    document.getElementById('matchScore').textContent = currentArea.match;
+    document.getElementById('targetAudience').textContent = currentArea.targetAudience;
+    
+    pricingDetails.style.display = 'block';
+  } else {
+    selectedName.textContent = 'No district selected';
+    selectedName.style.color = 'var(--muted)';
+    pricingDetails.style.display = 'none';
+  }
+}
+function updateSelection(){
+  const t=document.getElementById('selectionText');
+  const areaTxt=currentArea?`${currentArea.name} (${currentArea.match}% match)`:'—';
+  const priceTxt=currentArea?currentArea.price:'—';
+  t.textContent = `Area: ${areaTxt} · Elevation: ${capitalize(currentElevation)} · Price: ${priceTxt}`;
+}
+
+/* Elevation selector */
+document.querySelectorAll('.elevation-card').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('.elevation-card').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active'); currentElevation=c.dataset.slot; showOnlySlot(currentElevation); updateSelection();
+  });
+});
+function showOnlySlot(slot){
+  ['side','front','back'].forEach(s=>{
+    const el=document.getElementById('slot-'+s);
+    if(!el) return;
+    if(s===slot){ el.style.opacity='1'; el.style.filter='saturate(1.2)'; }
+    else{ el.style.opacity='.4'; el.style.filter='grayscale(.7)'; }
+  });
+}
+showOnlySlot('side');
+
+/* Upload ad artwork → apply to all slots */
+const imgs={ side:document.getElementById('ad-side'), front:document.getElementById('ad-front'), back:document.getElementById('ad-back') };
+const fileInput=document.getElementById('fileInput'), clearArt=document.getElementById('clearArt');
+fileInput.addEventListener('change', e=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  const url=URL.createObjectURL(f);
+  Object.values(imgs).forEach(img=>{ if(img){ img.src=url; img.style.display='block'; } });
+});
+clearArt.addEventListener('click', ()=>{
+  fileInput.value=''; Object.values(imgs).forEach(img=>{ if(img){ img.removeAttribute('src'); img.style.display='none'; } });
+});
+
+/* Rent + Download */
+document.getElementById('rentBtn')?.addEventListener('click',()=> alert('Thanks! We’ll contact you to finalize your TukTuk AdRide booking.'));
+document.getElementById('downloadBtn')?.addEventListener('click',()=>{
+  const node=document.querySelector('.tuktuk');
+  html2canvas(node,{backgroundColor:null}).then(canvas=>{
+    const a=document.createElement('a'); a.download='tuktuk-mockup.png'; a.href=canvas.toDataURL(); a.click();
+  });
+});
+
+/* Initialize */
+document.querySelectorAll('#bkk path').forEach(p=>{ if(!p.dataset.name) p.dataset.name='Chatuchak'; });
+renderAreaButtons();
+</script>
+</body>
+</html>
